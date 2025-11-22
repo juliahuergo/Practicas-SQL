@@ -1,0 +1,128 @@
+create table Autores(
+    DNI varchar2(9) PRIMARY KEY,
+    Nombre varchar2(20),
+    Apellido varchar2(20),
+    FechaNacimiento date,
+    Pais varchar2(10)
+)
+
+create table Libros(
+    ISBN varchar2(30) PRIMARY KEY,
+    Titulo varchar2(20),
+    Anyo integer 
+)
+
+CREATE TABLE Escribe(
+    DNI  VARCHAR2(9),
+    ISBN VARCHAR2(30),
+    PRIMARY KEY (DNI, ISBN),
+    FOREIGN KEY (DNI)  REFERENCES Autores(DNI),
+    FOREIGN KEY (ISBN) REFERENCES Libros(ISBN)
+);
+
+INSERT INTO Autores VALUES
+('12345678A', 'Gabriel', 'García Márquez', DATE '1927-03-06', 'Colombia');
+INSERT INTO Autores VALUES
+('23456789B', 'Isabel', 'Allende', DATE '1942-08-02', 'Chile');
+INSERT INTO Autores VALUES
+('34567890C', 'Mario', 'Vargas Llosa', DATE '1936-03-28', 'Perú');
+INSERT INTO Autores VALUES
+('45678901D', 'Julio', 'Cortázar', DATE '1914-08-26', 'Argentina');
+INSERT INTO Autores VALUES
+('56789012E', 'Laura', 'Restrepo', DATE '1950-03-01', 'Colombia');
+INSERT INTO Autores VALUES
+('67890123F', 'Carlos', 'Fuentes', DATE '1928-11-11', 'México');
+INSERT INTO Autores VALUES
+('78901234G', 'Jorge Luis', 'Borges', DATE '1899-08-24', 'Argentina');
+INSERT INTO Autores VALUES
+('89012345H', 'Eduardo', 'Galeano', DATE '1940-09-03', 'Uruguay');
+
+INSERT INTO Libros VALUES
+('978-84-376-0494-7', 'Cien años de soleda', 1967);
+INSERT INTO Libros VALUES
+('978-84-204-4669-1', 'El amor en los', 1985);
+INSERT INTO Libros VALUES
+('978-84-663-4901-2', 'La casa de los', 1982);
+INSERT INTO Libros VALUES
+('978-84-204-6321-6', 'Conversación en', 1969);
+INSERT INTO Libros VALUES
+('978-84-376-0991-1', 'Rayuela', 1963);
+INSERT INTO Libros VALUES
+('978-84-339-7268-4', 'Del amor y otros', 1994);
+INSERT INTO Libros VALUES
+('978-84-339-7302-5', 'La ciudad y los perr', 1963); 
+INSERT INTO Libros VALUES
+('978-84-204-7395-6', 'El otoño del patri', 1975);
+INSERT INTO Libros VALUES
+('978-84-376-0810-5', 'El Aleph', 1949);
+INSERT INTO Libros VALUES
+('978-84-233-2999-5', 'Las venas abiertas', 1971);
+
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('12345678A', '978-84-376-0494-7');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('12345678A', '978-84-204-4669-1');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('12345678A', '978-84-204-7395-6');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('23456789B', '978-84-663-4901-2');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('34567890C', '978-84-204-6321-6');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('34567890C', '978-84-339-7302-5');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('45678901D', '978-84-376-0991-1');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('56789012E', '978-84-339-7268-4');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('67890123F', '978-84-233-2999-5');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('78901234G', '978-84-376-0810-5');
+INSERT INTO Escribe (DNI, ISBN) VALUES
+('89012345H', '978-84-233-2999-5'); 
+
+
+
+1) 
+SELECT a.Nombre, a.Apellido
+FROM Autores a
+JOIN Escribe e ON a.DNI = e.DNI
+JOIN Libros l ON e.ISBN = l.ISBN
+WHERE l.Anyo = 2022
+ORDER BY a.FechaNacimiento DESC;
+
+2)
+SELECT l.ISBN, l.Titulo, count(a.DNI) as NumAutores, count(a.Pais) as NumPaises
+FROM Libros l
+JOIN Escribe e on e.ISBN = l.ISBN 
+JOIN Autores a on e.DNI = a.DNI
+WHERE l.Anyo = 2022
+group by l.ISBN, l.Titulo
+having count(a.DNI) > 1;
+
+3)
+select distinct a.Nombre, a.Apellido
+from Autores a
+join Escribe e on e.DNI = a.DNI
+join Libros l on l.ISBN = e.ISBN
+where l.anyo = 2022
+group by a.DNI, a.Nombre, a.Apellido
+having count(l.ISBN) = 0;
+
+4)
+select l.Titulo, count(a.DNI)
+from Libros l
+join Escribe e on e.ISBN = l.ISBN
+join Autores a on e.DNI = a.DNI
+where l.anyo = 2022 and a.Pais = 'España'
+group by l.Titulo;
+
+5)
+select a.Nombre, a.Apellido, count(l.ISBN)
+from Autores a 
+join Escribe e on e.DNI = a.DNI
+join Libros l on l.ISBN = e.ISBN
+where a.Pais = 'España'
+group by  a.Nombre, a.Apellido
+order by count(l.ISBN) desc
+fetch first 1 rows only;
