@@ -1,0 +1,25 @@
+CREATE TABLE productos(
+    codigoPr varchar2(2) PRIMARY KEY,
+    descripcionPf varchar2(25),
+    stock integer,
+	precio number(6,2),
+    CHECK (stock >= 0)   
+)
+
+
+create table clientes(
+    NIF varchar2(9) PRIMARY KEY,
+    nombre varchar2(15) NOT NULL,
+    apellido1 varchar2(25) NOT NULL,
+    apellido2 varchar2(25)
+)
+
+
+create table pedidos(
+    codPed varchar2(3) PRIMARY KEY,
+    NIF varchar2(9),
+    codigoPr varchar2(2),
+    foreign key(NIF) references clientes,
+    foreign key(codigoPr) references productos,
+    cantidad integer
+)
