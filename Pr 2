@@ -1,0 +1,83 @@
+create table libros(
+    ISBN integer,
+    titulo varchar2(20),
+    editorial varchar2(20),
+    anoDeEdicion integer,
+    numeroDePaginas integer
+)
+create table clientes(
+    NIF varchar2(9),
+    nombre varchar2(20),
+    apellidos varchar2(20),
+    direccion varchar2(30),
+    edad integer,
+    telefono integer
+)
+create table prestamos(
+    ISBN integer,
+    NIF varchar2(9),
+    fechaDePrestamo date,
+    fechaDeDevolucion date
+)
+INSERT INTO libros values(1234568920, 'Pulgarcito', 'Pulgarcita Edic', 1920, 80);
+INSERT INTO libros values(281283798141, 'El lobo feroz', 'Penguin', 1929, 10);
+INSERT INTO libros values(98475943650, 'Chuchu', 'Tu madre', 1807, 90);
+INSERT INTO libros values(236487246, 'Adio', 'Muy buenas', 1492, 102);
+INSERT INTO libros values(934628764301, 'Te quiero', 'verde', 1789, 13);
+INSERT INTO libros values(0498679263476, 'Hola', 'caracola', 2000, 36);
+INSERT INTO libros values(237498234923, 'Me aburro', 'Infinito', 1898, 89);
+INSERT INTO libros values(3246374623648723, 'Bar', 'Por favor', 2007, 113);
+
+INSERT INTO clientes VALUES(1111, 'Juan', 'Pérez del Arroyo', 'Cartagena', 88, 18273816);
+INSERT INTO clientes VALUES(1212, 'Pablete', 'Gómez de la Serna', 'Oviedo', 99, 6234394);
+INSERT INTO clientes VALUES(2222, 'Clarencia', 'Expósito', 'Madrid', 65, 8763482);
+INSERT INTO clientes VALUES(3333, 'Teresa', 'Palencia', 'Río de Janeiro', 34, 8769869);
+INSERT INTO clientes VALUES(4444, 'John', 'Doe', 'Calcuta', 12, 827345);
+INSERT INTO clientes VALUES(5555, 'Pepe', 'Doe', 'Ciudad Real', 3, 8686868);
+
+
+alter session set nls_date_format = 'DD-MM-YYYY';
+INSERT INTO prestamos VALUES(1234568920, 1111, TO_DATE('19-08-2006'), TO_DATE('19-08-2009'));
+INSERT INTO prestamos VALUES(281283798141, 1212, TO_DATE('01-02-1987'), TO_DATE('26-09-2025'));
+INSERT INTO prestamos VALUES(236487246, 2222, TO_DATE('11-03-2001'), TO_DATE('05-12-2009'));
+INSERT INTO prestamos VALUES(934628764301, 3333, TO_DATE('23-08-2015'), TO_DATE('12-03-2016'));
+INSERT INTO prestamos VALUES(0498679263476, 4444, TO_DATE('25-06-2009'), TO_DATE('19-08-2013'));
+INSERT INTO prestamos VALUES(237498234923, 5555, TO_DATE('04-12-2020'), TO_DATE('04-11-2022'));
+
+
+CREATE TABLE incorrectos AS
+SELECT *
+FROM prestamos
+WHERE fechaDePrestamo > fechaDeDevolucion;
+
+delete from prestamos where fechaDePrestamo > fechaDeDevolucion;
+
+SELECT DISTINCT l.ISBN, l.titulo
+FROM libros l
+JOIN prestamos p ON l.ISBN = p.ISBN
+WHERE p.fechaDeDevolucion > SYSDATE;
+
+SELECT DISTINCT c.NIF, c.telefono
+FROM clientes c
+JOIN prestamos p ON c.NIF = p.NIF
+WHERE p.fechaDeDevolucion > sysdate;
+
+SELECT
+  p.ISBN,
+  p.NIF,
+  p.fechaDePrestamo,
+  GREATEST(0, TRUNC(MONTHS_BETWEEN(SYSDATE, p.fechaDePrestamo))) AS meses_transcurridos
+FROM prestamos p;
+
+select distinct nombre, apellidos, titulo from libros, clientes
+
+SELECT c.NIF
+FROM clientes c
+WHERE c.NIF NOT IN (
+    SELECT p.NIF
+    FROM prestamos p
+);
+
+select c.NIF from clientes c, libros l where l.titulo in (select l.titulo  from clientes c, libros l where c.nif = 1111);
+
+select c.nombre from clientes c, libros l where l.titulo in (select l.titulo  from clientes c, libros l where c.nif = 
